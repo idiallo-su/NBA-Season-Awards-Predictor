@@ -30,6 +30,8 @@
 
 import twitter
 
+import config
+
 
 def oauth_login():
     # XXX: Go to http://twitter.com/apps/new to create an app and get values
@@ -38,10 +40,10 @@ def oauth_login():
     # See https://developer.twitter.com/en/docs/basics/authentication/overview/oauth
     # for more information on Twitter's OAuth implementation.
 
-    CONSUMER_KEY = ''
-    CONSUMER_SECRET = ''
-    OAUTH_TOKEN = ''
-    OAUTH_TOKEN_SECRET = ''
+    CONSUMER_KEY = config.CONSUMER_KEY
+    CONSUMER_SECRET = config.CONSUMER_SECRET
+    OAUTH_TOKEN = config.OAUTH_TOKEN
+    OAUTH_TOKEN_SECRET = config.OAUTH_TOKEN_SECRET
 
     auth = twitter.oauth.OAuth(OAUTH_TOKEN, OAUTH_TOKEN_SECRET,
                                CONSUMER_KEY, CONSUMER_SECRET)
