@@ -9,6 +9,8 @@ import csv
 import os
 import sys
 import time
+import spacy
+from spacytextblob.spacytextblob import TextBlob  # https://pypi.org/project/spacytextblob/
 
 import config
 
@@ -45,13 +47,13 @@ if __name__ == '__main__':
     start_date = datetime(2023, 1, 1)
     end_date = datetime(2023, 4, 9)  # Can push to a later date
 
-    folder_name = 'Voter-Filtered-Tweets'
-    os.makedirs(folder_name, exist_ok=True)
+    tweets_folder_name = 'Voter-Filtered-Tweets'
+    os.makedirs(tweets_folder_name, exist_ok=True)
 
     # Harvest tweets from each voter
     for username in mvp_voter_usernames:
         print(username)
-        username = username[1:] # Remove '@' sign
+        username = username[1:]  # Remove '@' sign
 
         tweets = harvest_user_timeline(twitter_api, screen_name=username, max_results=2)
 
@@ -73,7 +75,7 @@ if __name__ == '__main__':
 
         # Save the filtered tweets to a json file within Voter-Filtered-Tweets
         filename = f'{username}_filtered_tweets.json'
-        filepath = os.path.join(folder_name, filename)
+        filepath = os.path.join(tweets_folder_name, filename)
         with open(filepath, 'w') as f:
             json.dump(filtered_tweets, f, indent=4)
             print("{0} tweets dumped in {1}".format(username, filename))
@@ -83,6 +85,34 @@ if __name__ == '__main__':
     # Analyze the sentiment of the tweets using natural language processing (NLP) techniques. NLP libraries: NLTK or
     # spaCy to identify the sentiment of the tweets (positive, negative, or neutral) towards specific players.
     # ------------------------------------------------------------------------------------------------------------------
+
+    nlp = spacy.load("en_core_web_sm")
+    nlp.add_pipe("textblob")
+
+    sentiment_folder_name = 'Sentiment-By-Player'
+    os.makedirs(sentiment_folder_name, exist_ok=True)
+
+    mvp_tweets_path = os.path.join(os.path.dirname(__file__), 'Voter-Filtered-Tweets')
+
+    # Go through player names in filtered tweets and analyze the sentiment for that player
+    # Store count on the sentiments in 4 column csv (name, positive, neutral, negative)
+    # Player object-oriented approach is an option too
+    for username in mvp_voter_usernames:
+        filename = f'{username}_filtered_tweets.json'
+        filepath = os.path.join(mvp_tweets_path, filename)
+
+        positive_tweets = 0
+        neutral_tweets = 0
+        negative_tweets = 0
+
+        # Get filtered tweets from json file
+        # for ___ in ___ :
+        #     doc = nlp(tweet)
+        #     sentiment = doc._.polarity
+
+            # Increment variable based on sentiment
+
+        # Save sentiment data for this player
 
     # ------------------------------------------------------------------------------------------------------------------
     # Task 4
