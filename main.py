@@ -10,7 +10,8 @@ import os
 import sys
 import time
 import spacy
-from spacytextblob.spacytextblob import TextBlob  # https://pypi.org/project/spacytextblob/
+from spacytextblob.spacytextblob import TextBlob
+# from textblob import TextBlob
 
 import config
 
@@ -43,8 +44,7 @@ if __name__ == '__main__':
     print(mvp_voter_usernames, '\n')
 
     # Date range to harvest tweets from
-    # start_date = datetime(2022, 10, 18)  # Start of the NBA regular season
-    start_date = datetime(2023, 1, 1)
+    start_date = datetime(2022, 10, 18)  # Start of the NBA regular season
     end_date = datetime(2023, 4, 9)  # Can push to a later date
 
     tweets_folder_name = 'Voter-Filtered-Tweets'
@@ -77,13 +77,14 @@ if __name__ == '__main__':
         filename = f'{username}_filtered_tweets.json'
         filepath = os.path.join(tweets_folder_name, filename)
         with open(filepath, 'w') as f:
-            json.dump(filtered_tweets, f, indent=4)
+            json.dump(filtered_tweets, f, indent="")
             print("{0} tweets dumped in {1}".format(username, filename))
 
     # ------------------------------------------------------------------------------------------------------------------
     # Task 3
     # Analyze the sentiment of the tweets using natural language processing (NLP) techniques. NLP libraries: NLTK or
     # spaCy to identify the sentiment of the tweets (positive, negative, or neutral) towards specific players.
+    # https://pypi.org/project/spacytextblob/
     # ------------------------------------------------------------------------------------------------------------------
 
     nlp = spacy.load("en_core_web_sm")
@@ -101,18 +102,36 @@ if __name__ == '__main__':
         filename = f'{username}_filtered_tweets.json'
         filepath = os.path.join(mvp_tweets_path, filename)
 
+        print("Reading tweets from {0}".format(username))
+
         positive_tweets = 0
         neutral_tweets = 0
         negative_tweets = 0
 
+        with open(filename) as f:
+            tweet_json = json.load()
+
         # Get filtered tweets from json file
-        # for ___ in ___ :
-        #     doc = nlp(tweet)
-        #     sentiment = doc._.polarity
+        if not tweet_json:
+            print("This file is empty")
+        else:
+            for item in tweet_json :
+                if 'text' in item:
+                    text_value = item['text']
 
-            # Increment variable based on sentiment
+                    doc = nlp(text_value)
+                    sentiment = doc._.blob.polarity
+                    print("Sentiment of {0} for {1}".format(sentiment, text_value))
 
-        # Save sentiment data for this player
+                    # Increment variable based on sentiment
+                    if sentiment < 0.1:
+                        negative_tweets += 1
+                    elif -0.1 <= sentiment <= 0.1:
+                        neutral_tweets += 1
+                    elif 0.1 < sentiment:
+                        positive_tweets += 1
+
+        # Save sentiment data for this player in csv
 
     # ------------------------------------------------------------------------------------------------------------------
     # Task 4
