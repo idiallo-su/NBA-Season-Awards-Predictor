@@ -7,19 +7,20 @@ import twitter
 import json
 import csv
 import os
+import re
 import sys
 import time
 import spacy
-from spacytextblob.spacytextblob import TextBlob
+import pandas as pd
+#from spacytextblob.spacytextblob import TextBlob
 # from textblob import TextBlob
 
-import config
+#import config
 
 from TwitterCookbook import oauth_login, make_twitter_request, harvest_user_timeline
 
 
 if __name__ == '__main__':
-
     twitter_api = oauth_login()
 
     print("Twitter Api {0}\n".format(twitter_api))
@@ -91,9 +92,6 @@ if __name__ == '__main__':
     #spaCy: pip install spacy
     #English Model: python - m spacy download en_core_web_sm
 
-    # Import Pandas dataframe containing tweets for  analysis
-    import pandas as pd
-    import spaCy
     nlp = spacy.load("en_core_web_sm")
     #May not need: nlp.add_pipe("textblob")
     def prepareTweet(tweet): # Remove stopwords (and, a, an, etc), punctuation, special characters. convert everything to lower case.
@@ -111,7 +109,7 @@ if __name__ == '__main__':
 
         #Remove Stopwords  and punctuation
         #https://spacy.io/api/token for .is_stop .is_punct
-        processedTweet = [token.text for token in tokens if not token.is_stop and not token.is_punct]
+        processedTweet = [token.text for token in tweetDoc if not token.is_stop and not token.is_punct]
 
         finalProcessedTweet = " ".join(processedTweet)
 
@@ -121,14 +119,14 @@ if __name__ == '__main__':
         #Return polarity score
         #Polarity Score: -1.0 (Negative)  to 1.0 (Positive)
         polarity = doc.sentiment.polarity
-        priint(polarity)
+        print(polarity)
         return polarity
 
     def categorizePolarity(score): #Categorizes the polarity as either Positive, Negative or neutral
         if score > 0:
             return "positive"
         if score < 0:
-            return  "negative"
+            return "negative"
         else: return "neutral"
 
 
@@ -145,13 +143,15 @@ if __name__ == '__main__':
     votersDataframesList = []
 
     #Filter through list of voters
+    print("mvp_voter_usernames: ",  mvp_voter_usernames)
     for username in mvp_voter_usernames:
         #Initialize Counts
         positive_tweets = 0
         neutral_tweets = 0
         negative_tweets = 0
 
-        filename = f'{username}_filtered_tweets.json'
+        filename = f'{username[1:]}_filtered_tweets.json'
+        print("Username: ", username)
         filepath = os.path.join(mvp_tweets_path, filename)
 
         print("Reading tweets from {0}".format(username))
@@ -190,13 +190,19 @@ if __name__ == '__main__':
 
                     #Increment count
                     if polarityCategory == "positive":
+                        print("positive")
                         positive_tweets += 1
+                        print(positive_tweets)
                     elif polarityCategory == "negative":
+                        print("negative")
                         negative_tweets += 1
+                        print(negative_tweets)
                     elif polarityCategory == "neutral":
+                        print("neutrals")
                         neutral_tweets += 1
+                        print(neutral_tweets)
 
-
+    print(votersDataframesList)
         # Save sentiment data for this player in csv
 
     # ------------------------------------------------------------------------------------------------------------------
