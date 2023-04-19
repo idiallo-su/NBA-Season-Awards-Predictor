@@ -11,6 +11,7 @@ import re
 import sys
 import time
 import spacy
+from spacytextblob.spacytextblob import SpacyTextBlob
 import pandas as pd
 #from spacytextblob.spacytextblob import TextBlob
 # from textblob import TextBlob
@@ -97,7 +98,7 @@ if __name__ == '__main__':
     def prepareTweet(tweet): # Remove stopwords (and, a, an, etc), punctuation, special characters. convert everything to lower case.
 
         #Special characters, digits
-        tweet = re.sub("(\\d|\\W)+","",tweet)
+        tweet = re.sub("(\\d|\\W)+"," ",tweet)
 
         #Make lowercase
         tweet = tweet.lower()
@@ -115,11 +116,14 @@ if __name__ == '__main__':
 
         return finalProcessedTweet
     def calculateSentimentScore(tweet): #Calculate sentiment score
+        nlp = spacy.load("en_core_web_sm")
+        nlp.add_pipe('spacytextblob')
+        print("Calculating polarity for tweet: ", tweet)
         doc = nlp(tweet)
         #Return polarity score
         #Polarity Score: -1.0 (Negative)  to 1.0 (Positive)
-        polarity = doc.sentiment.polarity
-        print(polarity)
+        polarity = doc._.blob.polarity
+        print("polarity: ", polarity)
         return polarity
 
     def categorizePolarity(score): #Categorizes the polarity as either Positive, Negative or neutral
@@ -151,17 +155,24 @@ if __name__ == '__main__':
         negative_tweets = 0
 
         filename = f'{username[1:]}_filtered_tweets.json'
-        print("Username: ", username)
+        #print("Username: ", username)
+        current_dir = os.getcwd()
+        #print("filename ", filename)
+        #print("Curr_dir", current_dir)
+
+
+
         filepath = os.path.join(mvp_tweets_path, filename)
+        #print("filePath ", filepath)
 
         print("Reading tweets from {0}".format(username))
 
         #Create voter's dataframe
         #Dataframe will hold: tweet, processedTweet, polarityScore, polarityCategory, and nominee/player
-        df = pd.read_json(filename)
+        df = pd.read_json(filepath)
 
-        with open(filename) as f:
-            tweet_json = json.load()
+        with open(filepath) as f:
+            tweet_json = json.load(f)
 
         # Get filtered tweets from json file
         if not tweet_json:
@@ -172,7 +183,9 @@ if __name__ == '__main__':
                     text_value = item['text']
 
                     #Filter tweet
+                    print("original tweet: ", text_value)
                     processedTweet = prepareTweet(text_value)
+                    print("processedTweet: ", processedTweet)
                     df["preparedTweet"] = processedTweet # df["preparedTweet"] = df["text"].apply(prepareTweet) #Create colomun for preparedTweets
 
                     #Calculate polarity score
@@ -187,23 +200,26 @@ if __name__ == '__main__':
 
                     #Append dataFrame to voterslist
                     votersDataframesList.append(df)
+                    print("voters dataframe list: \n", votersDataframesList)
+                    print("dataframe: \n", df)
 
                     #Increment count
                     if polarityCategory == "positive":
                         print("positive")
                         positive_tweets += 1
-                        print(positive_tweets)
+                        print("increment positive, new positive_tweets: ", positive_tweets)
                     elif polarityCategory == "negative":
                         print("negative")
                         negative_tweets += 1
-                        print(negative_tweets)
+                        print("increment negative, new negative_tweets: ", negative_tweets)
                     elif polarityCategory == "neutral":
                         print("neutrals")
                         neutral_tweets += 1
-                        print(neutral_tweets)
+                        print("increment neutral, new neutral_tweets: ", neutral_tweets)
+        print("Positive Tweets: ", positive_tweets)
+        print("Negative Tweets: ", negative_tweets)
+        print("Neutral Tweets: ", neutral_tweets)
 
-    print(votersDataframesList)
-        # Save sentiment data for this player in csv
 
     # ------------------------------------------------------------------------------------------------------------------
     # Task 4
