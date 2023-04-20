@@ -20,6 +20,32 @@ import pandas as pd
 
 from TwitterCookbook import oauth_login, make_twitter_request, harvest_user_timeline
 
+# ----------------------------------------------------------------------------------------------------------------------
+# Player Object Creation - Used throughout the project
+# Keeps track of player name, any aliases (tbd), stats and sentiment score to be used to determine
+# likelihood of winning
+# ----------------------------------------------------------------------------------------------------------------------
+class Player:
+
+    #making a user instance
+    def __init__(self, name, aliases, stats, sentScore):
+        self.name = name
+        self.aliases = aliases
+        self.stats = stats
+        self.sentScores = sentScore
+
+    #user methods----------------------------------------------------------------------------
+    def checkMention(self, ls, text): #determine if a player is mentioned by name or alias
+        if self.name in ls:
+            return True
+        #check aliases
+        #for alias in text:
+         #if alias in text:
+                #return True
+        #return False
+    
+    #def getStats(self, str): #retrieve stats from documents if not initally given
+
 
 if __name__ == '__main__':
     twitter_api = oauth_login()
@@ -142,6 +168,9 @@ if __name__ == '__main__':
     # Go through player names in filtered tweets and analyze the sentiment for that player
     # Store count on the sentiments in 4 column csv (name, positive, neutral, negative)
     # Player object-oriented approach is an option too
+    
+    #list of nominees [Players]
+    nomList = []
 
     #Create a list to hold each voters dataframe.
     votersDataframesList = []
@@ -197,6 +226,15 @@ if __name__ == '__main__':
                     df["sentiment"] = polarityCategory #df["sentiment"] = df["polarity"].apply(categorizePolarity) #Puts tweet in positive, negative, or neutral categories
 
                     #Find any nominee names in the tweets
+                    people = [] # all people tagged in tweet
+                    mentNominies = []
+                    for ent in doc.ents:
+                        if (ent.label_ == "PERSON"):
+                            people.append(ent.text)
+    
+                    for p in playerList:
+                        if p.checkMention(people):
+                            mentNominies.append(p)
 
                     #Append dataFrame to voterslist
                     votersDataframesList.append(df)
