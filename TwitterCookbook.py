@@ -34,7 +34,7 @@ import os
 import sys
 import time
 
-import config
+#import config
 
 
 # Twitter Cookbook: Chapter 9 - Example 1. Accessing Twitter's API for development purposes
@@ -45,10 +45,10 @@ def oauth_login():
     # See https://developer.twitter.com/en/docs/basics/authentication/overview/oauth
     # for more information on Twitter's OAuth implementation.
 
-    CONSUMER_KEY = config.CONSUMER_KEY
-    CONSUMER_SECRET = config.CONSUMER_SECRET
-    OAUTH_TOKEN = config.OAUTH_TOKEN
-    OAUTH_TOKEN_SECRET = config.OAUTH_TOKEN_SECRET
+    CONSUMER_KEY = 'AIZqbzPyEPxtokxdKFnozPCNe'
+    CONSUMER_SECRET = 'sZxFPtdwQPPjG7ytGsCJDQrAoh6LXbFQ1K0A3ZDar0jWvywY5l'
+    OAUTH_TOKEN = '1496910867119624194-2QGEZqA55ufL4IriJKGTvL9p39P5g2'
+    OAUTH_TOKEN_SECRET = 'GiNwfVYgfjnWONo5NhVf2G3wmklirPNibUrFf8Nsku0rn'
 
     auth = twitter.oauth.OAuth(OAUTH_TOKEN, OAUTH_TOKEN_SECRET,
                                CONSUMER_KEY, CONSUMER_SECRET)
