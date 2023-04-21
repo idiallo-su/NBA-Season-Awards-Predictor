@@ -169,8 +169,10 @@ if __name__ == '__main__':
     # Store count on the sentiments in 4 column csv (name, positive, neutral, negative)
     # Player object-oriented approach is an option too
     
-    #list of nominees [Players]
-    nomList = []
+    #dictionary of nominees and starting score (0) {Player Name : 0}
+    nomList = {"Joel Embiid": 0,
+               "Giannis": 0,
+               "Nikola Jokic": 0}
 
     #Create a list to hold each voters dataframe.
     votersDataframesList = []
@@ -227,14 +229,17 @@ if __name__ == '__main__':
 
                     #Find any nominee names in the tweets
                     people = [] # all people tagged in tweet
-                    mentNominies = []
+                    mentNominies = [] #mentioned athletes for a given tweet
+
+                    #find all people tagged entities
                     for ent in doc.ents:
                         if (ent.label_ == "PERSON"):
                             people.append(ent.text)
-    
-                    for p in playerList:
-                        if p.checkMention(people):
-                            mentNominies.append(p)
+
+                    #check if any noms are mentioned
+                    for n in nomList:
+                        if n in people:
+                            mentNominies.append(n)
 
                     #Append dataFrame to voterslist
                     votersDataframesList.append(df)
