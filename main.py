@@ -18,7 +18,7 @@ import pandas as pd
 
 #import config
 
-from TwitterCookbook import oauth_login, make_twitter_request, harvest_user_timeline
+from TwitterCookbook import oauth_login, make_twitter_request, harvest_user_timeline, twitter_search
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Player Object Creation - Used throughout the project
@@ -58,55 +58,37 @@ if __name__ == '__main__':
     # season. Use relevant hashtags or keywords to filter tweets specifically about NBA players.
     # ------------------------------------------------------------------------------------------------------------------
 
-    mvp_voter_path = os.path.join(os.path.dirname(__file__), 'NBA-Season-Award-Voters/MVP Voters By Year.csv')
-
-    # Get voter usernames from csv file
-    with open(mvp_voter_path, newline='') as mvp_voter_file:
-        reader = csv.reader(mvp_voter_file)
-        mvp_voter_usernames = []
-
-        for i, row in enumerate(reader):
-            if row[7] != '':
-                mvp_voter_usernames.append(row[7])
-
-    print(mvp_voter_usernames, '\n')
-
-    # Date range to harvest tweets from
-    start_date = datetime(2022, 10, 18)  # Start of the NBA regular season
-    end_date = datetime(2023, 4, 9)  # Can push to a later date
-
-    tweets_folder_name = 'Voter-Filtered-Tweets'
+    tweets_folder_name = 'Tag-Filtered-Tweets'
     os.makedirs(tweets_folder_name, exist_ok=True)
 
+
+    mvp_voter_path = os.path.join(os.path.dirname(__file__), 'NBA-Season-Award-Voters/MVP Voters By Year.csv')
+
+    #TAGS OF INTEREST IN TWEET RETRIEVAL
+    tags = ["jokic", "giannis", "embid"]
+
     # Harvest tweets from each voter
-    for username in mvp_voter_usernames:
-        print(username)
-        username = username[1:]  # Remove '@' sign
+    for t in tags:
+        tweets = twitter_search(twitter_api, t, max_results=10)
 
-        tweets = harvest_user_timeline(twitter_api, screen_name=username, max_results=2)
-
-        print("{0} tweets: ".format(username))
+        print("{0} tweets: ".format(t))
         print(tweets)
 
         # Filter tweets by date and possibly player names
         filtered_tweets = []
         for tweet in tweets:
-            created_at_str = tweet['created_at']
-            created_at = datetime.strptime(created_at_str, '%a %b %d %H:%M:%S +0000 %Y')
             # print("Tweet created at {0}\n".format(created_at))
+            filtered_tweets.append(tweet)
 
-            if start_date <= created_at <= end_date:
-                filtered_tweets.append(tweet)
-
-        print("{0} filtered tweets: ".format(username))
+        print("{0} filtered tweets: ".format(t))
         print(filtered_tweets)
 
         # Save the filtered tweets to a json file within Voter-Filtered-Tweets
-        filename = f'{username}_filtered_tweets.json'
+        filename = f'{t}_filtered_tweets.json'
         filepath = os.path.join(tweets_folder_name, filename)
         with open(filepath, 'w') as f:
             json.dump(filtered_tweets, f, indent="")
-            print("{0} tweets dumped in {1}".format(username, filename))
+            print("{0} tweets dumped in {1}".format(t, filename))
 
     # ------------------------------------------------------------------------------------------------------------------
     # Task 3
@@ -119,7 +101,7 @@ if __name__ == '__main__':
     #spaCy: pip install spacy
     #English Model: python - m spacy download en_core_web_sm
 
-    nlp = spacy.load("en_core_web_sm")
+   nlp = spacy.load("en_core_web_sm")
     #May not need: nlp.add_pipe("textblob")
     def prepareTweet(tweet): # Remove stopwords (and, a, an, etc), punctuation, special characters. convert everything to lower case.
 
@@ -163,7 +145,7 @@ if __name__ == '__main__':
     sentiment_folder_name = 'Sentiment-By-Player'
     os.makedirs(sentiment_folder_name, exist_ok=True)
 
-    mvp_tweets_path = os.path.join(os.path.dirname(__file__), 'Voter-Filtered-Tweets')
+    mvp_tweets_path = os.path.join(os.path.dirname(__file__), 'Tag-Filtered-Tweets')
 
     # Go through player names in filtered tweets and analyze the sentiment for that player
     # Store count on the sentiments in 4 column csv (name, positive, neutral, negative)
@@ -178,14 +160,14 @@ if __name__ == '__main__':
     votersDataframesList = []
 
     #Filter through list of voters
-    print("mvp_voter_usernames: ",  mvp_voter_usernames)
-    for username in mvp_voter_usernames:
+    print("mvp_tag: ",  tags)
+    for tag in tags:
         #Initialize Counts
         positive_tweets = 0
         neutral_tweets = 0
         negative_tweets = 0
 
-        filename = f'{username[1:]}_filtered_tweets.json'
+        filename = f'{tag}_filtered_tweets.json'
         #print("Username: ", username)
         current_dir = os.getcwd()
         #print("filename ", filename)
@@ -196,7 +178,7 @@ if __name__ == '__main__':
         filepath = os.path.join(mvp_tweets_path, filename)
         #print("filePath ", filepath)
 
-        print("Reading tweets from {0}".format(username))
+        print("Reading tweets from {0}".format(tag))
 
         #Create voter's dataframe
         #Dataframe will hold: tweet, processedTweet, polarityScore, polarityCategory, and nominee/player
@@ -232,13 +214,14 @@ if __name__ == '__main__':
                     mentNominies = [] #mentioned athletes for a given tweet
 
                     #find all people tagged entities
+                    doc = nlp(text_value)
                     for ent in doc.ents:
                         if (ent.label_ == "PERSON"):
                             people.append(ent.text)
 
                     #check if any noms are mentioned
-                    for n in nomList:
-                        if n in people:
+                    for p in people:
+                        if p in nomList:
                             mentNominies.append(n)
 
                     #Append dataFrame to voterslist
@@ -262,8 +245,6 @@ if __name__ == '__main__':
         print("Positive Tweets: ", positive_tweets)
         print("Negative Tweets: ", negative_tweets)
         print("Neutral Tweets: ", neutral_tweets)
-
-
     # ------------------------------------------------------------------------------------------------------------------
     # Task 4
     # Calculate the sentiment score for each player by aggregating the sentiment of tweets mentioning them. Can use
