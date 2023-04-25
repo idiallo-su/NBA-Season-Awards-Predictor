@@ -101,7 +101,7 @@ if __name__ == '__main__':
     #spaCy: pip install spacy
     #English Model: python - m spacy download en_core_web_sm
 
-    nlp = spacy.load("en_core_web_sm")
+   nlp = spacy.load("en_core_web_sm")
     #May not need: nlp.add_pipe("textblob")
     def prepareTweet(tweet): # Remove stopwords (and, a, an, etc), punctuation, special characters. convert everything to lower case.
 
@@ -245,8 +245,6 @@ if __name__ == '__main__':
         print("Positive Tweets: ", positive_tweets)
         print("Negative Tweets: ", negative_tweets)
         print("Neutral Tweets: ", neutral_tweets)
-
-
     # ------------------------------------------------------------------------------------------------------------------
     # Task 4
     # Calculate the sentiment score for each player by aggregating the sentiment of tweets mentioning them. Can use
