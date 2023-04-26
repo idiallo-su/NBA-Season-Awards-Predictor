@@ -133,7 +133,7 @@ def harvest_user_timeline(twitter_api, screen_name=None, user_id=None, max_resul
     assert (screen_name != None) != (user_id != None), "Must have screen_name or user_id, but not both"
 
     kw = {  # Keyword args for the Twitter API call
-        'count': 20,
+        'count': 2000,
         'trim_user': 'true',
         'include_rts': 'true',
         'since_id': 1

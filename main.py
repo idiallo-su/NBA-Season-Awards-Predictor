@@ -83,7 +83,7 @@ if __name__ == '__main__':
         print(username)
         username = username[1:]  # Remove '@' sign
 
-        tweets = harvest_user_timeline(twitter_api, screen_name=username, max_results=2)
+        tweets = harvest_user_timeline(twitter_api, screen_name=username, max_results=200)
 
         print("{0} tweets: ".format(username))
         print(tweets)
@@ -96,7 +96,7 @@ if __name__ == '__main__':
             # print("Tweet created at {0}\n".format(created_at))
 
             if start_date <= created_at <= end_date:
-                filtered_tweets.append(tweet)
+                filtered_tweets.append(tweet['text'])
 
         print("{0} filtered tweets: ".format(username))
         print(filtered_tweets)
@@ -270,11 +270,19 @@ if __name__ == '__main__':
     # different aggregation techniques such as mean or sum to calculate the sentiment score.
     # ------------------------------------------------------------------------------------------------------------------
 
+    # Created a system to help obtain sentiment score whereby positive is +1, neutal is 0 and negative is -1
+        totalNumTweets = positive_tweets + negative_tweets + neutral_tweets
+        sentimentScore = ((positive_tweets * 1) + (neutral_tweets * 0) + (negative_tweets * -1))/ totalNumTweets
+        print("Sentiment Score: ", sentimentScore)
+        print("***********************************************************************************************")
     # ------------------------------------------------------------------------------------------------------------------
     # Task 5
     # Identify the top players based on their sentiment scores and cross-check their performances with the statistics
     # such as points per game, rebounds per game, assists per game, etc.
     # ------------------------------------------------------------------------------------------------------------------
+
+
+
 
     # ------------------------------------------------------------------------------------------------------------------
     # Task 6
