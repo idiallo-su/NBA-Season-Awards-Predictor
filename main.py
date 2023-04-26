@@ -13,6 +13,8 @@ import time
 import spacy
 from spacytextblob.spacytextblob import SpacyTextBlob
 import pandas as pd
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import accuracy_score
 #from spacytextblob.spacytextblob import TextBlob
 # from textblob import TextBlob
 
@@ -175,6 +177,7 @@ if __name__ == '__main__':
             tweet_json = json.load(f)
 
         # Get filtered tweets from json file
+        print("Current File: ", filename)
         if not tweet_json:
             print("This file is empty")
         else:
@@ -233,9 +236,140 @@ if __name__ == '__main__':
     # such as points per game, rebounds per game, assists per game, etc.
     # ------------------------------------------------------------------------------------------------------------------
 
+
     # ------------------------------------------------------------------------------------------------------------------
     # Task 6
     # Use machine learning algorithms to predict which player is most likely to be voted as the NBA regular season
     # MVP based on the broadcasters' votes and fan sentiment. Sentiment score and player statistics can be used as
     # input features for the machine learning model.
     # ------------------------------------------------------------------------------------------------------------------
+
+    # Prepare your data and # Split your data
+    #X =  # Combine candidate stats, previous winners stats, sentiment of tweets, and team records into a single dataset
+    #y =  # The target variable (whether or not the candidate won the MVP award)
+
+    #2021-2022 season.
+    #Player = [year, Teamseed, gamesPlayed, pts, rbs, assts, fg % ft %]
+
+    nJokic2022 = [2022, 6, 74, 27.1, 13.8, 7.9, .583, .81]
+    jEmbiid2022 = [2022, 4, 68, 30.6, 11.7, 4.2, .499, .814]
+    gAntetokounmpo2022 = [2022, 3, 67, 29.9, 11.6, 5.8, .553, .722]
+    dBooker2022 = [2022, 1, 68, 26.8, 5, 4.8, .466, .868]
+    lDoncic2022 = [2022, 4, 65, 28.4, 9.1, 8.7, .457, .744]
+    jTatum2022 = [2022, 2, 76, 26.9, 8, 4.4, .453, .853]
+    jMorant2022 = [2022, 2, 57, 27.4, 5.7, 6.7, .493, .761]
+    sCurry2022 = [2022, 3, 64, 25.5, 5.2, 6.3, .437, .923]
+    cPaul2022 = [2022, 1, 65, 14.7, 4.4, 10.8, .493, .837]
+    dDerozan2022 = [2022, 6, 76, 27.9, 5.2, 4.9, .504, .877]
+    kDurant2022 = [2022, 7, 55, 29.9, 7.4, 6.4, .518, .91]
+    lJames2022 = [2022, 11, 56, 30.3, 8.2, 6.2, .524, .756]
+
+    #2019-2020
+    gAntetokounmpo2020 = [2020, 1, 63, 29.5, 13.6, 5.6, .553, .633]
+    lJames2020 = [2020, 1, 67, 25.3, 7.8, 10.2, .493, .693]
+    jHarden2020 = [2020, 4, 68, 34.3, 6.6, 7.5, .444, .865]
+    lDoncic2020 = [2020, 7, 61, 28.8, 9.4, 8.8, .463, .758]
+    kLeonard2020 = [2020, 2, 57, 27.1, 7.1, 4.9, .47, .886]
+    aDavis2020 = [2020, 1, 62, 26.1, 9.3, 3.2, .503, .846]
+    cPaul2020 = [2020, 5, 70, 17.6, 5.0, 6.7, .489, .907]
+    dLillard2020 = [2020, 8, 66, 30.0, 4.3, 8.0, .463, .888]
+    nJokic2020 = [2020, 3, 73, 19.9, 9.7, 7.0, .528, .817]
+    pSiakam2020 = [2020, 2, 60, 22.9, 7.3, 3.5, .453, .792]
+    jButler2020 = [2020, 6, 58, 19.9, 6.7, 6.0, .455, .834]
+    jTatum2020 = [2020, 3, 66, 23.4, 7.0, 3.0, .450, .812]
+
+    #2018-2019
+    gAntetokounmpo2019 = [2019, 1, 72, 27.7, 12.5, 5.9, .578, .729]
+    jHarden2019 = [2019, 4, 78, 36.1, 6.6, 7.5, .442, .879]
+    pGeorge2019 = [2019, 6, 77, 28, 8.2, 4.1, .438, .839]
+    nJokic2019 = [2019, 2, 80, 20.1, 10.8, 7.3, .511, .821]
+    sCurry2019 = [2019, 1, 69, 27.3, 5.3, 5.2, .472, .916]
+    dLillard2019 = [2019, 3, 80, 25.8, 4.6, 6.9, .444, .912]
+    jEmbiid2019 = [2019, 3, 64, 27.5, 13.6, 3.7, .484, .804]
+    kDurant2019 = [2019, 1, 78, 26, 6.4, 5.9, .521, .885]
+    kLeonard2019 = [2019, 2, 60, 26.6, 7.3, 3.3, .496, .854]
+    rWestbrook2019 = [2019, 6, 73, 22.9, 11.1, 10.7, .428, .656]
+    rGobert2019 = [2019, 5, 81, 15.9, 12.9, 2.0, .669, .636]
+    lJames2019 = [2019, 10, 55, 27.4, 8.5, 8.3, .51, .665]
+
+    #2013-2014
+    kDurant2014 = [2014, 2, 81, 32, 7.4, 5.5, .503, .873]
+    lJames2014 = [2014, 2, 77, 27.1, 6.9, 6.3, .567, .750]
+    bGriffin2014 = [2014, 3, 80, 24.1, 9.5, 3.9, .528, .715]
+    jNoah2014 = [2014, 4, 80, 12.6, 11.3, 5.4, .475, .737]
+    jHarden2014 = [2014, 4, 73, 25.4, 4.7, 6.1, .456, .866]
+    sCurry2014 = [2014, 6, 78, 24.0, 4.3, 8.5, .471, .885]
+    cPaul2014 = [2014, 3, 62, 19.1, 4.3, 10.7, .467, .885]
+    aJefferson2014 = [2014, 7, 73, 21.8, 10.8, 2.1, .509, .690]
+    pGeorge2014 = [2014, 1, 80, 21.7, 6.8, 3.5, .424, .864]
+    lAldridge2014 = [2014, 5, 69, 23.2, 11.1, 2.6, .458, .822]
+    kLove2014 = [2014, 10, 77, 26.1, 12.5, 4.4, .457, .821]
+    tDuncan2014 = [2014, 1, 74, 15.1, 9.7, 3.0, .490, .731]
+    tParker2014 = [2014, 1, 68, 16.7, 2.3, 5.7, .499, .811]
+    dNowitzki2014 = [2014, 8, 80, 21.7, 6.2, 2.7, .497, .899]
+    cAnthony2014 = [2014, 9, 77, 27.4, 8.1, 3.1, .452, .848]
+    gDragic2014 = [2014, 9, 76, 20.3, 3.2, 5.9, .505, .760]
+    mConley2014 = [2014, 7, 73, 17.2, 2.9, 6.0, .450, .815]
+
+    #Test Set
+    x_train2022 = [nJokic2022, jEmbiid2022, gAntetokounmpo2022, dBooker2022, lDoncic2022, jTatum2022, jMorant2022, sCurry2022, cPaul2022, dDerozan2022, kDurant2022, lJames2022]
+    y_train2022 = [True, False, False, False, False, False, False, False, False, False, False, False]
+    x_train2020 = [gAntetokounmpo2020, lJames2020, jHarden2020, lDoncic2020, kLeonard2020, aDavis2020, cPaul2020, dLillard2020, nJokic2020, pSiakam2020, jButler2020, jTatum2020]
+    y_train2020 = [True, False, False, False, False, False, False, False, False, False, False, False]
+    x_train2019 = [gAntetokounmpo2019, jHarden2019, pGeorge2019, nJokic2019, sCurry2019, dLillard2019, jEmbiid2019, kDurant2019, kLeonard2019, rWestbrook2019, rGobert2019, lJames2019]
+    y_train2019 = [True, False, False, False, False, False, False, False, False, False, False, False ]
+    x_train2014 = [kDurant2014, lJames2014, bGriffin2014, jNoah2014, jHarden2014, sCurry2014, cPaul2014, aJefferson2014, pGeorge2014, lAldridge2014, kLove2014, tDuncan2014, tParker2014, dNowitzki2014, cAnthony2014, gDragic2014, mConley2014]
+    y_train2014 = [True, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False, False]
+
+    x_train = x_train2020 + x_train2022
+    y_train = y_train2020 + y_train2022
+
+    #2020-2021 Season. Train set
+    nJokic2021 = [2021, 3, 72, 26.4, 10.8, 8.3, .566, .868]
+    jEmbiid2021 = [2021, 1, 51, 28.5, 10.6, 2.8, .513, .859]
+    sCurry2021 = [2021, 8, 63, 32.0, 5.5, 5.8, .482, .916]
+    gAntetokounmpo2021 = [2021, 3, 61, 28.1, 11, 5.9, .569, .685]
+    cPaul2021 = [2021, 2, 70, 16.4, 4.5, 8.9, .499, .934]
+    lDoncic2021 = [2021, 5, 66, 27.7, 8, 8.6, .479, .730]
+    dLillard2021 = [2021, 6, 67, 28.8, 4.2, 7.5, .451, .928]
+    jRandle2021 = [2021, 4, 71, 24.1, 10.2, 6, .456, .811]
+    dRose2021 = [2021, 4, 59, 14.7, 2.6, 4.2, .47, .866]
+    rGobert2021 = [2021, 1, 71, 14.3, 13.5, 1.3, .675, .623]
+    rWestbrook2021 = [2021, 8, 65, 22.2, 11.5, 11.7, .439, .656]
+    bSimmons2021 = [2021, 1, 58, 14.3, 7.2, 6.9, .557, .613]
+    jHarden2021 = [2021, 2, 44, 24.6, 7.9, 10.8, .466, .861]
+    lJames2021 = [2021, 7, 45, 25.0, 7.7, 7.8, .513, .698]
+    kLeonard2021 = [2021, 4, 52, 24.8, 6.5, 5.2, .512, .885]
+
+
+
+    #Train Set
+    x_test = [nJokic2021, jEmbiid2021, sCurry2021, gAntetokounmpo2021, cPaul2021, lDoncic2021, dLillard2021, jRandle2021, dRose2021, rGobert2021, rWestbrook2021, bSimmons2021, jHarden2021, lJames2021, kLeonard2021]
+    y_test = [True, False, False, False, False, False, False, False, False, False, False, False, False, False, False]
+
+
+
+    # Train model
+    clf = DecisionTreeClassifier()
+    clf.fit(x_train, y_train)
+
+    # Evaluate  model
+    y_pred = clf.predict(x_test)
+    accuracy = accuracy_score(y_test, y_pred)
+    print(f"\n\n\nTest set Accuracy: {accuracy:.2f}")
+
+    #2023 Candidates
+    # Player = [Teamseed, gamesPlayed, pts, rbs, assts, fg % ft %]
+    jEmbiid2023 = [2023, 3, 66, 33.1, 10.2, 4.2, .548, .857]
+    gAntetokounmpo2023 = [2023, 1, 63, 31.1, 11.8, 5.7, .553, .645]
+    nJokic2023 = [2023, 1, 69, 24.5, 11.8, 9.8, .632, .822]
+
+    #Predict the winner
+    players = [jEmbiid2023, gAntetokounmpo2023, nJokic2023]
+    predictions = []
+    for player in players:
+        prediction = clf.predict([player])
+        predictions.append(bool(prediction[0]))
+
+    # Print the list of predictions
+    print("This years Predictions: ", predictions)
