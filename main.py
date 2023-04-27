@@ -71,7 +71,7 @@ if __name__ == '__main__':
     mvp_voter_path = os.path.join(os.path.dirname(__file__), 'NBA-Season-Award-Voters/MVP Voters By Year.csv')
 
     #TAGS OF INTEREST IN TWEET RETRIEVAL
-    tags = ["jokic", "giannis", "embiid"]
+    tags = ["jokic", "giannis", "embiid", "mvpnba", "nba"]
 
     # Harvest tweets from each voter
     for t in tags:
