@@ -232,12 +232,14 @@ if __name__ == '__main__':
                     
                     #give out scores
                     for n in mentNominies:
-                        mentNominies[n] += polarityScore
+                        print("[n]: ", n)
+                        nomList[n] += polarityScore
+                        print(n,"'s new score: ", nomList[n] )
 
                     #Append dataFrame to voterslist
                     votersDataframesList.append(df)
-                    print("voters dataframe list: \n", votersDataframesList)
-                    print("dataframe: \n", df)
+                    #print("voters dataframe list: \n", votersDataframesList)
+                    #print("dataframe: \n", df)
 
                     #Increment count
                     if polarityCategory == "positive":
@@ -266,11 +268,11 @@ if __name__ == '__main__':
     ranking = [nomList["Joel Embiid"] , nomList["Giannis"], nomList["Nikola Jokic"]]
     players = ["Joel Embiid", "Giannis", "Nikola Jokic"]
     first = None
-    firstScore = None
+    firstScore = -10000
     second = None
-    secondScore = None
+    secondScore = -10000
     third = None
-    thirdScore = None
+    thirdScore = -10000
     for i in range(3):
         #If new top sentiment is found
         if ranking[i] > firstScore:
