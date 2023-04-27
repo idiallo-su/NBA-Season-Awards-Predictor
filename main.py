@@ -13,6 +13,8 @@ import time
 import spacy
 from spacytextblob.spacytextblob import SpacyTextBlob
 import pandas as pd
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import accuracy_score
 #from spacytextblob.spacytextblob import TextBlob
 # from textblob import TextBlob
 
@@ -253,11 +255,47 @@ if __name__ == '__main__':
         print("Positive Tweets: ", positive_tweets)
         print("Negative Tweets: ", negative_tweets)
         print("Neutral Tweets: ", neutral_tweets)
+        print("nomList: ", nomList)
+
+
     # ------------------------------------------------------------------------------------------------------------------
     # Task 4
     # Calculate the sentiment score for each player by aggregating the sentiment of tweets mentioning them. Can use
     # different aggregation techniques such as mean or sum to calculate the sentiment score.
     # ------------------------------------------------------------------------------------------------------------------
+    ranking = [nomList["Joel Embiid"] , nomList["Giannis"], nomList["Nikola Jokic"]]
+    players = ["Joel Embiid", "Giannis", "Nikola Jokic"]
+    first = None
+    firstScore = None
+    second = None
+    secondScore = None
+    third = None
+    thirdScore = None
+    for i in range(3):
+        #If new top sentiment is found
+        if ranking[i] > firstScore:
+            #Move intial first down to second
+            second = first
+            secondScore = firstScore
+            #Move initial second down to third
+            third = second
+            thirdScore = secondScore
+            #Replace new first
+            first = players[i]
+            firstScore = ranking[i]
+        #If player isnt top sentiment, but may be second
+        elif ranking[i] > secondScore:
+            #Move initial second down to third
+            third = second
+            thirdScore = secondScore
+            #Replace second
+            second = players[i]
+            secondScore = ranking[i]
+        else:
+            third = players[i]
+            thirdScore = ranking[i]
+
+    print("First: ", first, " Second: ", second, " Third: ", third)
 
     # ------------------------------------------------------------------------------------------------------------------
     # Task 5
@@ -271,3 +309,87 @@ if __name__ == '__main__':
     # MVP based on the broadcasters' votes and fan sentiment. Sentiment score and player statistics can be used as
     # input features for the machine learning model.
     # ------------------------------------------------------------------------------------------------------------------
+
+
+    #2023 Candidates
+    # Player = [Teamseed, gamesPlayed, pts, rbs, assts, fg % ft %]
+    jEmbiid2023 = [3, 66, 33.1, 10.2, 4.2, .548, .857]
+    gAntetokounmpo2023 = [1, 63, 31.1, 11.8, 5.7, .553, .645]
+    nJokic2023 = [1, 69, 24.5, 11.8, 9.8, .632, .822]
+
+    #Apply points multiplier
+    if first == "Joel Embiid":
+        jEmbiid2023[2] *= 1.15
+    elif first == "Giannis":
+        gAntetokounmpo2023[2] *= 1.15
+    else:
+        nJokic2023[2] *= 1.15
+
+    if second == "Joel Embiid":
+        jEmbiid2023[2] *= 1.1
+    elif second == "Giannis":
+        gAntetokounmpo2023[2] *= 1.1
+    else:
+        nJokic2023[2] *= 1.1
+
+    #Training Set
+    #2021-2022 season.
+    #Player = [year, Teamseed, gamesPlayed, pts, rbs, assts, fg % ft %]
+    nJokic2022 = [6, 74, 27.1, 13.8, 7.9, .583, .81]
+    jEmbiid2022 = [4, 68, 30.6, 11.7, 4.2, .499, .814]
+    gAntetokounmpo2022 = [3, 67, 29.9, 11.6, 5.8, .553, .722]
+    dBooker2022 = [1, 68, 26.8, 5, 4.8, .466, .868]
+    lDoncic2022 = [4, 65, 28.4, 9.1, 8.7, .457, .744]
+    jTatum2022 = [2, 76, 26.9, 8, 4.4, .453, .853]
+    jMorant2022 = [2, 57, 27.4, 5.7, 6.7, .493, .761]
+    sCurry2022 = [3, 64, 25.5, 5.2, 6.3, .437, .923]
+    cPaul2022 = [1, 65, 14.7, 4.4, 10.8, .493, .837]
+    dDerozan2022 = [6, 76, 27.9, 5.2, 4.9, .504, .877]
+    kDurant2022 = [7, 55, 29.9, 7.4, 6.4, .518, .91]
+    lJames2022 = [11, 56, 30.3, 8.2, 6.2, .524, .756]
+
+    x_train = [nJokic2022, jEmbiid2022, gAntetokounmpo2022, dBooker2022, lDoncic2022, jTatum2022, jMorant2022, sCurry2022, cPaul2022, dDerozan2022, kDurant2022, lJames2022]
+    y_train = [True, False, False, False, False, False, False, False, False, False, False, False]
+
+    #Testing Set
+    #2020-2021 Season. Train set
+    nJokic2021 = [3, 72, 26.4, 10.8, 8.3, .566, .868]
+    jEmbiid2021 = [1, 51, 28.5, 10.6, 2.8, .513, .859]
+    sCurry2021 = [8, 63, 32.0, 5.5, 5.8, .482, .916]
+    gAntetokounmpo2021 = [ 3, 61, 28.1, 11, 5.9, .569, .685]
+    cPaul2021 = [ 2, 70, 16.4, 4.5, 8.9, .499, .934]
+    lDoncic2021 = [ 5, 66, 27.7, 8, 8.6, .479, .730]
+    dLillard2021 = [6, 67, 28.8, 4.2, 7.5, .451, .928]
+    jRandle2021 = [ 4, 71, 24.1, 10.2, 6, .456, .811]
+    dRose2021 = [4, 59, 14.7, 2.6, 4.2, .47, .866]
+    rGobert2021 = [1, 71, 14.3, 13.5, 1.3, .675, .623]
+    rWestbrook2021 = [8, 65, 22.2, 11.5, 11.7, .439, .656]
+    bSimmons2021 = [1, 58, 14.3, 7.2, 6.9, .557, .613]
+    jHarden2021 = [2, 44, 24.6, 7.9, 10.8, .466, .861]
+    lJames2021 = [7, 45, 25.0, 7.7, 7.8, .513, .698]
+    kLeonard2021 = [4, 52, 24.8, 6.5, 5.2, .512, .885]
+
+    x_test = [nJokic2021, jEmbiid2021, sCurry2021, gAntetokounmpo2021, cPaul2021, lDoncic2021, dLillard2021, jRandle2021, dRose2021, rGobert2021, rWestbrook2021, bSimmons2021, jHarden2021, lJames2021, kLeonard2021]
+    y_test = [True, False, False, False, False, False, False, False, False, False, False, False, False, False, False]
+
+    # Train model
+    clf = DecisionTreeClassifier()
+    clf.fit(x_train, y_train)
+
+    # Evaluate  model
+    y_pred = clf.predict(x_test)
+    accuracy = accuracy_score(y_test, y_pred)
+    print(f"\n\n\nTest set Accuracy: {accuracy:.2f}")
+
+    # Predict the winner
+    players = [jEmbiid2023, gAntetokounmpo2023, nJokic2023]
+    predictions = []
+    for player in players:
+        prediction = clf.predict([player])
+        predictions.append(bool(prediction[0]))
+
+    # Print the list of predictions
+    print("This years Predictions: ", predictions)
+
+
+
