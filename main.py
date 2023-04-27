@@ -77,7 +77,7 @@ if __name__ == '__main__':
 
     # Harvest tweets from each voter
     for t in tags:
-        tweets = twitter_search(twitter_api, t, max_results=10)
+        tweets = twitter_search(twitter_api, t, max_results=20)
 
         print("{0} tweets: ".format(t))
         print(tweets)
@@ -165,13 +165,32 @@ if __name__ == '__main__':
     #Create a list to hold each voters dataframe.
     votersDataframesList = []
 
+    #Find count for each players individual count increment
+
+
     #Filter through list of voters
     print("mvp_tag: ",  tags)
+    # Initialize Counts
+    totalPositive = 0
+    totalNegative = 0
+    totalNeutral = 0
+
+    embiidPositive = 0
+    embiidNegative = 0
+    embiidNeutral = 0
+
+    giannisPositive = 0
+    giannisNegative = 0
+    giannisNeutral = 0
+
+    jokicPositive = 0
+    jokicNegative = 0
+    jokicNeutral = 0
+
+    count = 0
+
     for tag in tags:
-        #Initialize Counts
-        positive_tweets = 0
-        neutral_tweets = 0
-        negative_tweets = 0
+
 
         filename = f'{tag}_filtered_tweets.json'
         #print("Username: ", username)
@@ -193,6 +212,8 @@ if __name__ == '__main__':
         with open(filepath) as f:
             tweet_json = json.load(f)
 
+
+
         # Get filtered tweets from json file
         if not tweet_json:
             print("This file is empty")
@@ -200,20 +221,25 @@ if __name__ == '__main__':
             for item in tweet_json :
                 if 'text' in item:
                     text_value = item['text']
+                    count += 1
+                    print('count: ', count)
 
-                    #Filter tweet
-                    print("original tweet: ", text_value)
+                    #Filter tweet                           #print("original tweet: ", text_value)
                     processedTweet = prepareTweet(text_value)
-                    print("processedTweet: ", processedTweet)
-                    df["preparedTweet"] = processedTweet # df["preparedTweet"] = df["text"].apply(prepareTweet) #Create colomun for preparedTweets
+
+                                                            #print("processedTweet: ", processedTweet)
+
 
                     #Calculate polarity score
                     polarityScore = calculateSentimentScore(processedTweet)
-                    df["polarity"] = polarityScore #df["polarity"] = df["preparedTweet"].apply(calculateSentimentScore) #Create a colomun for Polarity scores
+
 
                     #Label positice, negative, or neutral
-                    polarityCategory = categorizePolarity(polarityScore) #
-                    df["sentiment"] = polarityCategory #df["sentiment"] = df["polarity"].apply(categorizePolarity) #Puts tweet in positive, negative, or neutral categories
+                    polarityCategory = categorizePolarity(polarityScore)
+
+                    # df["preparedTweet"] = processedTweet # df["preparedTweet"] = df["text"].apply(prepareTweet) #Create colomun for preparedTweets
+                    # df["polarity"] = polarityScore #df["polarity"] = df["preparedTweet"].apply(calculateSentimentScore) #Create a colomun for Polarity scores
+                    # df["sentiment"] = polarityCategory #df["sentiment"] = df["polarity"].apply(categorizePolarity) #Puts tweet in positive, negative, or neutral categories
 
                     #Find any nominee names in the tweets
                     people = [] # all people tagged in tweet
@@ -232,30 +258,82 @@ if __name__ == '__main__':
                     
                     #give out scores
                     for n in mentNominies:
-                        mentNominies[n] += polarityScore
+                        print("[Mentioned]: ", n)
+
+                        #update Polarity
+                        nomList[n] += polarityScore
+                        print(n,"'s new score: ", nomList[n] )
+
+                        #Increment counts
+                        if polarityCategory == "positive":
+                            print("positive")
+                            totalPositive += 1
+                            if n == "Giannis":
+                                giannisPositive += 1
+                                print("increment giannisPositive, new positive_tweets: ", giannisPositive)
+                            if n == "Joel Embiid":
+                                embiidPositive += 1
+                                print("increment embiidPositive, new positive_tweets: ", embiidPositive)
+                            if n == "Nikola Jokic":
+                                jokicPositive += 1
+                                print("increment jokicPositive, new positive_tweets: ", jokicPositive)
+
+                        elif polarityCategory == "negative":
+                            totalNegative += 1
+                            if n == "Giannis":
+                                giannisNegative += 1
+                                print("increment giannisNegative, new positive_tweets: ", giannisNegative)
+                            if n == "Joel Embiid":
+                                embiidNegative += 1
+                                print("increment embiidNegative, new positive_tweets: ", embiidNegative)
+                            if n == "Nikola Jokic":
+                                jokicNegative += 1
+                                print("increment jokicNegative, new positive_tweets: ", jokicNegative)
+
+                        elif polarityCategory == "neutral":
+                            totalNeutral += 1
+                            if n == "Giannis":
+                                giannisNeutral += 1
+                                print("increment giannisNeutral, new positive_tweets: ", giannisNeutral)
+                            if n == "Joel Embiid":
+                                embiidNeutral += 1
+                                print("increment embiidNeutral, new positive_tweets: ", embiidNeutral)
+                            if n == "Nikola Jokic":
+                                jokicNegative += 1
+                                print("increment jokicNegative, new positive_tweets: ", jokicNegative)
 
                     #Append dataFrame to voterslist
                     votersDataframesList.append(df)
-                    print("voters dataframe list: \n", votersDataframesList)
-                    print("dataframe: \n", df)
+                    #print("voters dataframe list: \n", votersDataframesList)
+                    #print("dataframe: \n", df)
 
-                    #Increment count
-                    if polarityCategory == "positive":
-                        print("positive")
-                        positive_tweets += 1
-                        print("increment positive, new positive_tweets: ", positive_tweets)
-                    elif polarityCategory == "negative":
-                        print("negative")
-                        negative_tweets += 1
-                        print("increment negative, new negative_tweets: ", negative_tweets)
-                    elif polarityCategory == "neutral":
-                        print("neutrals")
-                        neutral_tweets += 1
-                        print("increment neutral, new neutral_tweets: ", neutral_tweets)
-        print("Positive Tweets: ", positive_tweets)
-        print("Negative Tweets: ", negative_tweets)
-        print("Neutral Tweets: ", neutral_tweets)
-        print("nomList: ", nomList)
+    print("************Final Print************")
+    print("\nGiannis\n")
+    print("Giannis Positive Tweets: ", giannisPositive)
+    print("Giannis Negative Tweets: ", giannisNegative)
+    print("Giannis Neutral Tweets: ", giannisNeutral)
+
+    print("\nEmbiid\n")
+    print("Embiid Positive Tweets: ", embiidPositive)
+    print("Embiid Negative Tweets: ", embiidNegative)
+    print("Embiid Neutral Tweets: ", embiidNeutral)
+
+    print("\nJokic\n")
+    print("Jokic Positive Tweets: ", jokicPositive)
+    print("Jokic Negative Tweets: ", jokicNegative)
+    print("Jokic Neutral Tweets: ", jokicNeutral)
+
+    print("\nTotal Positive: ", totalPositive)
+    print("Total Negative: ", totalNegative)
+    print("Total Neutral: ", totalNeutral)
+    totalTweets = totalPositive + totalNegative + totalNeutral
+    print("Total Tweets Collected: ", totalTweets)
+    print("TOTAL TWEET COUNT: ", count)
+
+    print("\nnomList: ", nomList, '\n')
+
+
+
 
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -266,11 +344,11 @@ if __name__ == '__main__':
     ranking = [nomList["Joel Embiid"] , nomList["Giannis"], nomList["Nikola Jokic"]]
     players = ["Joel Embiid", "Giannis", "Nikola Jokic"]
     first = None
-    firstScore = None
+    firstScore = -10000
     second = None
-    secondScore = None
+    secondScore = -10000
     third = None
-    thirdScore = None
+    thirdScore = -10000
     for i in range(3):
         #If new top sentiment is found
         if ranking[i] > firstScore:
@@ -295,7 +373,7 @@ if __name__ == '__main__':
             third = players[i]
             thirdScore = ranking[i]
 
-    print("First: ", first, " Second: ", second, " Third: ", third)
+    print("\nFirst: ", first, " Second: ", second, " Third: ", third)
 
     # ------------------------------------------------------------------------------------------------------------------
     # Task 5
@@ -319,18 +397,18 @@ if __name__ == '__main__':
 
     #Apply points multiplier
     if first == "Joel Embiid":
-        jEmbiid2023[2] *= 1.15
-    elif first == "Giannis":
-        gAntetokounmpo2023[2] *= 1.15
-    else:
-        nJokic2023[2] *= 1.15
-
-    if second == "Joel Embiid":
         jEmbiid2023[2] *= 1.1
-    elif second == "Giannis":
+    elif first == "Giannis":
         gAntetokounmpo2023[2] *= 1.1
     else:
         nJokic2023[2] *= 1.1
+
+    if second == "Joel Embiid":
+        jEmbiid2023[2] *= 1.05
+    elif second == "Giannis":
+        gAntetokounmpo2023[2] *= 1.05
+    else:
+        nJokic2023[2] *= 1.05
 
     #Training Set
     #2021-2022 season.
@@ -379,7 +457,7 @@ if __name__ == '__main__':
     # Evaluate  model
     y_pred = clf.predict(x_test)
     accuracy = accuracy_score(y_test, y_pred)
-    print(f"\n\n\nTest set Accuracy: {accuracy:.2f}")
+    print(f"\n\nTest set Accuracy: {accuracy:.2f}")
 
     # Predict the winner
     players = [jEmbiid2023, gAntetokounmpo2023, nJokic2023]
@@ -389,7 +467,8 @@ if __name__ == '__main__':
         predictions.append(bool(prediction[0]))
 
     # Print the list of predictions
-    print("This years Predictions: ", predictions)
+
+    print("This years Predictions: \n", ["Embiid", "Giannis", "Jokic"], '\n', predictions)
 
 
 
