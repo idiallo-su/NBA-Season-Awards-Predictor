@@ -26,13 +26,14 @@ from TwitterCookbook import oauth_login, make_twitter_request, harvest_user_time
 # likelihood of winning
 # ----------------------------------------------------------------------------------------------------------------------
 class Player:
+    
 
     #making a user instance
-    def __init__(self, name, aliases, stats, sentScore):
+    def __init__(self, name, aliases, stats, polScore):
         self.name = name
         self.aliases = aliases
         self.stats = stats
-        self.sentScores = sentScore
+        self.pScore = polScore
 
     #user methods----------------------------------------------------------------------------
     def checkMention(self, ls, text): #determine if a player is mentioned by name or alias
@@ -52,6 +53,11 @@ if __name__ == '__main__':
 
     print("Twitter Api {0}\n".format(twitter_api))
 
+    #dictionary of nominees and starting score (0) {Player Name : 0}
+    nomList = {"Joel Embiid": 0,
+               "Giannis": 0,
+               "Nikola Jokic": 0}
+
     # ------------------------------------------------------------------------------------------------------------------
     # Task 2
     # Use Twitter's API to collect tweets from fans about NBA players' performances throughout the regular
@@ -65,7 +71,7 @@ if __name__ == '__main__':
     mvp_voter_path = os.path.join(os.path.dirname(__file__), 'NBA-Season-Award-Voters/MVP Voters By Year.csv')
 
     #TAGS OF INTEREST IN TWEET RETRIEVAL
-    tags = ["jokic", "giannis", "embid"]
+    tags = ["jokic", "giannis", "embiid"]
 
     # Harvest tweets from each voter
     for t in tags:
@@ -151,10 +157,8 @@ if __name__ == '__main__':
     # Store count on the sentiments in 4 column csv (name, positive, neutral, negative)
     # Player object-oriented approach is an option too
     
-    #dictionary of nominees and starting score (0) {Player Name : 0}
-    nomList = {"Joel Embiid": 0,
-               "Giannis": 0,
-               "Nikola Jokic": 0}
+    
+    
 
     #Create a list to hold each voters dataframe.
     votersDataframesList = []
@@ -222,7 +226,11 @@ if __name__ == '__main__':
                     #check if any noms are mentioned
                     for p in people:
                         if p in nomList:
-                            mentNominies.append(n)
+                            mentNominies.append(p)
+                    
+                    #give out scores
+                    for n in mentNominies:
+                        mentNominies[n] += polarityScore
 
                     #Append dataFrame to voterslist
                     votersDataframesList.append(df)
